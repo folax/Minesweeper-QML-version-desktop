@@ -1,0 +1,30 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>QMLs/StyleForButton.qml</file>
+        <file>QMLs/optionsWindow.qml</file>
+        <file>QMLs/resultWindow.qml</file>
+        <file>QMLs/Cell.qml</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file>images/app-background.png</file>
+        <file>images/smile.png</file>
+        <file>images/cell-empty-icon.png</file>
+        <file>images/cell-bomb-icon.png</file>
+        <file>images/hint-five-cell.png</file>
+        <file>images/hint-four-cell.png</file>
+        <file>images/hint-one-cell.png</file>
+        <file>images/hint-six-cell.png</file>
+        <file>images/hint-three-cell.png</file>
+        <file>images/hint-two-cell.png</file>
+        <file>images/cell-closed-icon.png</file>
+        <file>images/cell-flag-icon.png</file>
+        <file>images/cell-question-icon.png</file>
+        <file>images/timer-background.png</file>
+        <file>images/options-background.png</file>
+        <file>images/bomb-about.png</file>
+        <file>images/win-lose-background.png</file>
+        <file>images/hint-eight-cell.png</file>
+        <file>images/hint-seven-cell.png</file>
+    </qresource>
+</RCC>
