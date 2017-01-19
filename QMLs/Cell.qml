@@ -111,19 +111,30 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
-                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                 onClicked:
                 {
                     if(mouse.button == Qt.LeftButton)
                     {
                         timer1.start();
                         cppObject.leftMouseBtnClick(cellIndex);
+                        console.log(cppObject.getCellState(cellIndex))
                     }
-                    else
+                    else if(mouse.button == Qt.RightButton)
                     {
                         cppObject.rightMouseBtnClick(cellIndex);
                     }
                 }
+                onPressAndHold:
+                {
+                    if(mouse.button == Qt.MiddleButton)
+                        cppObject.middleMouseHold(cellIndex);
+
+                }
+//                onReleased: {
+//                    if(mouse.button == Qt.MiddleButton)
+//                        cppObject.middleMouseHold(-1);
+//                }
             }
         }
     }

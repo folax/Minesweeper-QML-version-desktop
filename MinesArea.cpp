@@ -112,6 +112,157 @@ void Minesweeper::rightMouseBtnClick(const int position)
     emit imageUpdate();
 }
 
+void Minesweeper::middleMouseHold(const int position)
+{
+    //note: coords first = y, coords second = x;
+    QPair <int, int> coords(posToCords(position));
+    QVector<QPair <int, int>> signsArr;
+    int areaW = m_cells2dArr.size() - 1;
+    int areaH = m_cells2dArr.at(0).size() - 1;
+
+    //заполняем массив закрытыми клетками вокруг цифры;
+    if(m_cells2dArr[coords.first][coords.second]->getCellState() == eDigit)
+    {
+        //вокруг клетки;
+        if ((coords.first < areaH && coords.second < areaW) && (coords.first > 0 && coords.second > 0))
+        {
+            for(int i = coords.first - 1; i <= coords.first + 1; ++i)
+            {
+                for(int j = coords.second - 1; j <= coords.second + 1; ++j)
+                {
+                    if (m_cells2dArr[i][j]->getCellVisibility() == false)
+                        signsArr.append(qMakePair(i, j));
+                }
+            }
+        }
+        //левый верхний угол;
+        if (coords.first == 0 && coords.second == 0)
+        {
+            if (m_cells2dArr[coords.first + 1][coords.second]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first + 1, coords.second));
+            if (m_cells2dArr[coords.first][coords.second + 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first, coords.second + 1));
+            if (m_cells2dArr[coords.first + 1][coords.second + 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first + 1, coords.second + 1));
+        }
+        //левый нижний угол;
+        else if (coords.first == areaH && coords.second == 0)
+        {
+            if (m_cells2dArr[coords.first][coords.second + 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first, coords.second + 1));
+            if (m_cells2dArr[coords.first - 1][coords.second]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first -1, coords.second));
+            if (m_cells2dArr[coords.first - 1][coords.second + 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first - 1, coords.second + 1));
+        }
+        //правый верхний угол;
+        else if (coords.first == 0 && coords.second == areaW)
+        {
+            if (m_cells2dArr[coords.first][coords.second - 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first, coords.second - 1));
+            if (m_cells2dArr[coords.first + 1][coords.second]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first + 1, coords.second));
+            if (m_cells2dArr[coords.first + 1][coords.second - 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first + 1, coords.second - 1));
+        }
+        //правый нижний угол;
+        else if (coords.first == areaH && coords.second == areaW)
+        {
+            if (m_cells2dArr[coords.first][coords.second - 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first, coords.second - 1));
+            if (m_cells2dArr[coords.first - 1][coords.second]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first - 1, coords.second));
+            if (m_cells2dArr[coords.first - 1][coords.second - 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first - 1, coords.second - 1));
+        }
+
+        /* вторая часть проверки; */
+
+        //проверка слева;
+        else if (coords.second == 0)
+        {
+            if (m_cells2dArr[coords.first][coords.second + 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first, coords.second + 1));
+            if (m_cells2dArr[coords.first + 1][coords.second]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first + 1, coords.second));
+            if (m_cells2dArr[coords.first + 1][coords.second + 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first + 1, coords.second + 1));
+            if (m_cells2dArr[coords.first - 1][coords.second]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first - 1, coords.second));
+            if (m_cells2dArr[coords.first - 1][coords.second + 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first - 1, coords.second + 1));
+        }
+        //проверка справа;
+        else if (coords.second == areaW)
+        {
+            if (m_cells2dArr[coords.first][coords.second - 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first, coords.second - 1));
+            if (m_cells2dArr[coords.first + 1][coords.second - 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first + 1, coords.second - 1));
+            if (m_cells2dArr[coords.first + 1][coords.second]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first + 1, coords.second));
+            if (m_cells2dArr[coords.first - 1][coords.second - 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first - 1, coords.second - 1));
+            if (m_cells2dArr[coords.first - 1][coords.second]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first - 1, coords.second));
+        }
+        //проверка сверху;
+        else if (coords.first == 0)
+        {
+            if (m_cells2dArr[coords.first][coords.second - 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first, coords.second - 1));
+            if (m_cells2dArr[coords.first][coords.second + 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first, coords.second + 1));
+            if (m_cells2dArr[coords.first + 1][coords.second - 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first + 1, coords.second - 1));
+            if (m_cells2dArr[coords.first + 1][coords.second]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first + 1, coords.second));
+            if (m_cells2dArr[coords.first + 1][coords.second + 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first + 1, coords.second + 1));
+        }
+        //проверка снизу;
+        else if (coords.first == areaH)
+        {
+            if (m_cells2dArr[coords.first][coords.second - 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first, coords.second - 1));
+            if (m_cells2dArr[coords.first][coords.second + 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first, coords.second + 1));
+            if (m_cells2dArr[coords.first - 1][coords.second - 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first - 1, coords.second - 1));
+            if (m_cells2dArr[coords.first - 1][coords.second]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first - 1, coords.second));
+            if (m_cells2dArr[coords.first - 1][coords.second + 1]->getCellVisibility() == false)
+                signsArr.append(qMakePair(coords.first - 1, coords.second + 1));
+        }
+
+        QVector< QPair<int, int>> flags;
+        for(int i(0); i < signsArr.size(); ++i)
+        {
+            if(m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->getCellFlag() == true)
+            {
+                flags.append(qMakePair(signsArr[i].first, signsArr[i].second));
+            }
+        }
+        int number = m_cells2dArr[coords.first][coords.second]->getCellDigit();
+        bool hasBomb = false;
+        if(flags.size() == number)
+        {
+            for(int i(0); i < signsArr.size(); ++i)
+            {
+                if(!m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->getCellFlag())
+                {
+                    m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->setCellVisibility(true);
+                    if(m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->getCellState() == eBomb)
+                        hasBomb = true;
+                }
+            }
+        }
+        if(hasBomb)
+            showAllBombs();
+    }
+    emit imageUpdate();
+}
+
 void Minesweeper::firstAreaBuild(int position)
 {
     //INFO: cells areas sizes 81, 256, 480 cells : 10, 40, 99 bombs : cells2dArr.size() = ширина, cells2dArr.at(0).size() = высота
@@ -604,15 +755,7 @@ void Minesweeper::foundEmptyCells(int position)
     //если бомба то открываем все бомбы;
     if (m_cells2dArr[_posX][_posY]->getCellState() == eBomb)
     {
-        for(int i(0); i < m_cells2dArr.size(); ++i)
-        {
-            for(int j(0); j < m_cells2dArr.at(0).size(); ++j)
-            {
-                if (m_cells2dArr[i][j]->getCellState() == eBomb)
-                    m_cells2dArr[i][j]->setState(eBomb, true);
-            }
-            emit loseSignal();
-        }
+        showAllBombs();
     }
 }
 
@@ -679,6 +822,19 @@ void Minesweeper::removeElement(QVector<QPair<int, int> > &pair, int pos1, int p
     {
         if(pair.at(i).first == pos1 && pair.at(i).second == pos2)
             pair.remove(i);
+    }
+}
+
+void Minesweeper::showAllBombs()
+{
+    for(int i(0); i < m_cells2dArr.size(); ++i)
+    {
+        for(int j(0); j < m_cells2dArr.at(0).size(); ++j)
+        {
+            if (m_cells2dArr[i][j]->getCellState() == eBomb)
+                m_cells2dArr[i][j]->setState(eBomb, true);
+        }
+        emit loseSignal();
     }
 }
 

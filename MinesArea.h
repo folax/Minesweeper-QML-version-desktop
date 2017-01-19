@@ -22,6 +22,7 @@ public:
     Q_INVOKABLE bool getCellVisibility(const int);
     Q_INVOKABLE void leftMouseBtnClick(const int);
     Q_INVOKABLE void rightMouseBtnClick(const int);
+    Q_INVOKABLE void middleMouseHold(const int);
     void firstAreaBuild(const int position);
     void foundEmptyCells(const int position);
     ~Minesweeper();
@@ -48,7 +49,9 @@ private:
     void readSettings();
     void writeSettings();
 
+    //this function generate empty fields around start position;
     void removeElement(QVector<QPair <int, int> >&, int, int);
+    void showAllBombs();
 };
 
 #endif // MINESWEEPER_H

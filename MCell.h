@@ -11,6 +11,7 @@ public:
     void setState(int state, bool bl) { m_state = state; m_cellIsOpened = bl; }
     void setStateDigit(int state, int digit, bool visible = false);
     void setFlagOnCell(const bool flag) { m_cellFlag = flag; }
+    void setCellVisibility(const bool flag) { m_cellIsOpened = flag; }
     int getCellFlag() { return m_cellFlag; }
     int getCellState() { return m_state; }
     int getCellDigit() { return m_cellDigit; }
