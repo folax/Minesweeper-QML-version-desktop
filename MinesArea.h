@@ -52,6 +52,7 @@ private:
     //this function generate empty fields around start position;
     void removeElement(QVector<QPair <int, int> >&, int, int);
     void showAllBombs();
+    void checkVictory();
 };
 
 #endif // MINESWEEPER_H

@@ -118,7 +118,6 @@ Item {
                     {
                         timer1.start();
                         cppObject.leftMouseBtnClick(cellIndex);
-                        console.log(cppObject.getCellState(cellIndex))
                     }
                     else if(mouse.button == Qt.RightButton)
                     {
@@ -131,10 +130,10 @@ Item {
                         cppObject.middleMouseHold(cellIndex);
 
                 }
-//                onReleased: {
-//                    if(mouse.button == Qt.MiddleButton)
-//                        cppObject.middleMouseHold(-1);
-//                }
+                onReleased: {
+                    if(mouse.button == Qt.MiddleButton)
+                        cppObject.middleMouseHold(-1);
+                }
             }
         }
     }
