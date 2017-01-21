@@ -8,14 +8,14 @@ class MCell
 
 public:
     explicit MCell(int posX, int posY, bool visible = false);
-    void setState(int state, bool bl) { m_state = state; m_cellIsOpened = bl; }
+    inline void setState(int state, bool bl) { m_state = state; m_cellIsOpened = bl; }
     void setStateDigit(int state, int digit, bool visible = false);
-    void setFlagOnCell(const bool flag) { m_cellFlag = flag; }
-    void setCellVisibility(const bool flag) { m_cellIsOpened = flag; }
-    int getCellFlag() { return m_cellFlag; }
-    int getCellState() { return m_state; }
-    int getCellDigit() { return m_cellDigit; }
-    bool getCellVisibility() { return m_cellIsOpened; }
+    inline void setFlagOnCell(const bool flag) { m_cellFlag = flag; }
+    inline void setCellVisibility(const bool flag) { m_cellIsOpened = flag; }
+    inline int getCellFlag() { return m_cellFlag; }
+    inline int getCellState() { return m_state; }
+    inline int getCellDigit() { return m_cellDigit; }
+    inline bool getCellVisibility() { return m_cellIsOpened; }
 
     ~MCell();
 

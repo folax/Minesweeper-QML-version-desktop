@@ -78,6 +78,10 @@ void Minesweeper::leftMouseBtnClick(const int position)
 
     //found empty cell and analize;
     foundEmptyCells(position);
+
+    //check for victory;
+    checkVictory();
+
     emit imageUpdate();
 }
 
@@ -235,23 +239,26 @@ void Minesweeper::middleMouseHold(const int position)
                 signsArr.append(qMakePair(coords.first - 1, coords.second + 1));
         }
 
-        QVector< QPair<int, int>> flags;
+        int cnt = 0;
         for(int i(0); i < signsArr.size(); ++i)
         {
             if(m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->getCellFlag() == true)
             {
-                flags.append(qMakePair(signsArr[i].first, signsArr[i].second));
+                cnt++;
             }
         }
         int number = m_cells2dArr[coords.first][coords.second]->getCellDigit();
         bool hasBomb = false;
-        if(flags.size() == number)
+        //если количество флагов равно значению цифры в нажатйо клетке то;
+        if(cnt == number)
         {
             for(int i(0); i < signsArr.size(); ++i)
             {
+                //если не значение клетки не равно флагу то;
                 if(!m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->getCellFlag())
                 {
                     m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->setCellVisibility(true);
+
                     if(m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->getCellState() == eBomb)
                         hasBomb = true;
                     if(m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->getCellState() == eClosed)
@@ -547,9 +554,6 @@ void Minesweeper::foundEmptyCells(int position)
 
     QVector<QPair <int, int>> emptyCellsAnalizeVec;
 
-    //check for victory;
-    checkVictory();
-
     //если цифра то открываем её;
     if (m_cells2dArr[_posX][_posY]->getCellState() == eDigit)
         m_cells2dArr[_posX][_posY]->setState(eDigit, true);
@@ -743,6 +747,7 @@ void Minesweeper::foundEmptyCells(int position)
         for(int i(0); i < emptyCellsAnalizeVec.size(); ++i)
         {
             foundEmptyCells(cordsToPos(emptyCellsAnalizeVec.at(i).first, emptyCellsAnalizeVec.at(i).second));
+            emit imageUpdate();
         }
         emptyCellsAnalizeVec.clear();
     }
@@ -836,7 +841,7 @@ void Minesweeper::showAllBombs()
 
 void Minesweeper::checkVictory()
 {
-    int openCells = 1;
+    int openCells = 0;
     for (QVector<MCell*> &vec_current : m_cells2dArr)
     {
         for (MCell* value : vec_current)
@@ -845,7 +850,7 @@ void Minesweeper::checkVictory()
                 ++openCells;
         }
     }
-    if(openCells == (m_cellsWidthSize * m_cellsHeightSize) - m_bombsNumber)
+    if(openCells >= (m_cellsWidthSize * m_cellsHeightSize) - m_bombsNumber)
         emit victorySignal();
 }
 
