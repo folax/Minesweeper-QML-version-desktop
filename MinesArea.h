@@ -6,6 +6,13 @@
 #include <QSettings>
 #include "MCell.h"
 
+struct prevState
+{
+    int x;
+    int y;
+    int state;
+};
+
 class Minesweeper : public QObject
 {
     Q_OBJECT
@@ -22,7 +29,7 @@ public:
     Q_INVOKABLE bool getCellVisibility(const int);
     Q_INVOKABLE void leftMouseBtnClick(const int);
     Q_INVOKABLE void rightMouseBtnClick(const int);
-    Q_INVOKABLE void middleMouseHold(const int);
+    Q_INVOKABLE void middleMouseClick(const int, const int);
     void firstAreaBuild(const int position);
     void foundEmptyCells(const int position);
     ~Minesweeper();
@@ -40,6 +47,7 @@ private:
     int m_bombsNumber;
 
     QVector<QVector <MCell*>> m_cells2dArr;
+    QVector<prevState> m_prevStates;
 
     //convertation position to X-Y coordinates
     QPair<int, int> posToCords(int position);

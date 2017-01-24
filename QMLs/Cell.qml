@@ -110,6 +110,7 @@ Item {
             }
 
             MouseArea {
+                //note: middleMouseClick second args: 1 = onMiddleButtonClick, 2 = onPressAndHold
                 anchors.fill: parent
                 acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                 onClicked:
@@ -123,16 +124,20 @@ Item {
                     {
                         cppObject.rightMouseBtnClick(cellIndex);
                     }
+                    else if(mouse.button == Qt.MiddleButton)
+                        cppObject.middleMouseClick(cellIndex, 1);
                 }
                 onPressAndHold:
                 {
                     if(mouse.button == Qt.MiddleButton)
-                        cppObject.middleMouseHold(cellIndex);
+                    {
+                        cppObject.middleMouseClick(cellIndex , 2);
+                    }
 
                 }
                 onReleased: {
                     if(mouse.button == Qt.MiddleButton)
-                        cppObject.middleMouseHold(-1);
+                        cppObject.middleMouseClick(cellIndex , 3);
                 }
             }
         }

@@ -116,7 +116,7 @@ void Minesweeper::rightMouseBtnClick(const int position)
     emit imageUpdate();
 }
 
-void Minesweeper::middleMouseHold(const int position)
+void Minesweeper::middleMouseClick(const int position, const int options)
 {
     //note: coords first = y, coords second = x;
     QPair <int, int> coords(posToCords(position));
@@ -238,40 +238,73 @@ void Minesweeper::middleMouseHold(const int position)
             if (m_cells2dArr[coords.first - 1][coords.second + 1]->getCellVisibility() == false)
                 signsArr.append(qMakePair(coords.first - 1, coords.second + 1));
         }
-
         int cnt = 0;
-        for(int i(0); i < signsArr.size(); ++i)
-        {
-            if(m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->getCellFlag() == true)
-            {
-                cnt++;
-            }
-        }
-        int number = m_cells2dArr[coords.first][coords.second]->getCellDigit();
         bool hasBomb = false;
-        //если количество флагов равно значению цифры в нажатйо клетке то;
-        if(cnt == number)
+        bool checkOfVictory = true;
+        //расчёт количества флагов;
+        if(options == 1)
         {
             for(int i(0); i < signsArr.size(); ++i)
             {
-                //если не значение клетки не равно флагу то;
-                if(!m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->getCellFlag())
+                if(m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->getCellFlag() == true)
                 {
-                    m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->setCellVisibility(true);
-
-                    if(m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->getCellState() == eBomb)
-                        hasBomb = true;
-                    if(m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->getCellState() == eClosed)
+                    cnt++;
+                }
+            }
+            int number = m_cells2dArr[coords.first][coords.second]->getCellDigit();
+            //если количество флагов равно значению цифры в нажатой клетке то;
+            if(cnt == number)
+            {
+                for(int i(0); i < signsArr.size(); ++i)
+                {
+                    //если не значение клетки не равно флагу то;
+                    if(!m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->getCellFlag())
                     {
-                        foundEmptyCells(cordsToPos(signsArr.at(i).first, signsArr.at(i).second));
+                        m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->setCellVisibility(true);
+
+                        if(m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->getCellState() == eBomb)
+                            hasBomb = true;
+                        if(m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->getCellState() == eClosed)
+                        {
+                            foundEmptyCells(cordsToPos(signsArr.at(i).first, signsArr.at(i).second));
+                        }
                     }
                 }
             }
         }
+        if(options == 2)
+        {
+            for(int i(0); i < signsArr.size(); ++i)
+            {
+                if(!m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->getCellFlag())
+                {
+                    prevState states;
+                    states.x = signsArr.at(i).first;
+                    states.y = signsArr.at(i).second;
+                    states.state = m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->getCellState();
+                    m_prevStates.push_back(states);
+                    m_cells2dArr[signsArr.at(i).first][signsArr.at(i).second]->setState(eOpen, true);
+                    checkOfVictory = false;
+                }
+            }
+        }
+        if(options == 3)
+        {
+            if(!m_prevStates.isEmpty())
+            {
+                for(int i(0); i < m_prevStates.size(); ++i)
+                {
+                    m_cells2dArr[m_prevStates.at(i).x][m_prevStates.at(i).y]->setState(m_prevStates.at(i).state, false);
+                }
+            }
+            m_prevStates.clear();
+            checkOfVictory = false;
+        }
         if(hasBomb)
             showAllBombs();
+        if(checkOfVictory)
+            checkVictory();
     }
-    checkVictory();
     emit imageUpdate();
 }
 
@@ -304,7 +337,7 @@ void Minesweeper::firstAreaBuild(int position)
 
     //расставляем бомбы на поле;
     int i = 0;
-    bool emptyNeighborhood = true;
+    //bool emptyNeighborhood = true;
     //*********************************
     QVector<QPair <int, int> > cordsPair;
     for(int i(0); i <= m_cells2dArr.size() - 1; ++i)
@@ -312,104 +345,104 @@ void Minesweeper::firstAreaBuild(int position)
         for(int j(0); j <= m_cells2dArr.at(0).size() - 1; ++j)
             cordsPair.append(qMakePair(i, j));
     }
+
+    //генерируем пустые клетки вокруг стартовой позиции;
+    //angles;
+    if(coords.first == 0 && coords.second == 0)
+    {
+        //qDebug() << "Left Top Angle";
+        removeElement(cordsPair, coords.first, coords.second + 1);
+        removeElement(cordsPair, coords.first + 1, coords.second);
+        removeElement(cordsPair, coords.first + 1, coords.second + 1);
+    }
+    else if(coords.first == areaW && coords.second == 0)
+    {
+        //qDebug() << "Left Bottom Angle";
+        removeElement(cordsPair, coords.first, coords.second + 1);
+        removeElement(cordsPair, coords.first - 1, coords.second);
+        removeElement(cordsPair, coords.first - 1, coords.second + 1);
+    }
+    else if(coords.first == areaW && coords.second == areaH)
+    {
+        //qDebug() << "Right Bottom Angle";
+        removeElement(cordsPair, coords.first, coords.second - 1);
+        removeElement(cordsPair, coords.first - 1, coords.second);
+        removeElement(cordsPair, coords.first - 1, coords.second - 1);
+    }
+    else if(coords.first == 0 && coords.second == areaH)
+    {
+        //qDebug() << "Right Top Angle";
+        removeElement(cordsPair, coords.first, coords.second - 1);
+        removeElement(cordsPair, coords.first + 1, coords.second - 1);
+        removeElement(cordsPair, coords.first + 1, coords.second);
+    }
+    //parallels;
+    else if(coords.second == 0 && coords.first > 0 && coords.first < areaW)
+    {
+        //qDebug() << "Left Down";
+        removeElement(cordsPair, coords.first, coords.second + 1);
+        removeElement(cordsPair, coords.first + 1, coords.second);
+        removeElement(cordsPair, coords.first + 1, coords.second + 1);
+        removeElement(cordsPair, coords.first - 1, coords.second);
+        removeElement(cordsPair, coords.first - 1, coords.second + 1);
+    }
+    else if(coords.second == areaH && coords.first > 0 && coords.first < areaW)
+    {
+        //qDebug() << "Right Down";
+        removeElement(cordsPair, coords.first, coords.second - 1);
+        removeElement(cordsPair, coords.first + 1, coords.second);
+        removeElement(cordsPair, coords.first + 1, coords.second - 1);
+        removeElement(cordsPair, coords.first - 1, coords.second);
+        removeElement(cordsPair, coords.first - 1, coords.second - 1);
+    }
+    else if(coords.first == 0 && coords.second > 0 && coords.second < areaH)
+    {
+        //qDebug() << "Upper Straight";
+        removeElement(cordsPair, coords.first, coords.second + 1);
+        removeElement(cordsPair, coords.first, coords.second - 1);
+        removeElement(cordsPair, coords.first + 1, coords.second - 1);
+        removeElement(cordsPair, coords.first + 1, coords.second);
+        removeElement(cordsPair, coords.first + 1, coords.second + 1);
+
+    }
+    else if(coords.first == areaW && coords.second > 0 && coords.second < areaH)
+    {
+        //qDebug() << "Bottom Straight";
+        removeElement(cordsPair, coords.first, coords.second + 1);
+        removeElement(cordsPair, coords.first, coords.second - 1);
+        removeElement(cordsPair, coords.first - 1, coords.second - 1);
+        removeElement(cordsPair, coords.first - 1, coords.second);
+        removeElement(cordsPair, coords.first - 1, coords.second + 1);
+    }
+    else
+    {
+        //qDebug() << "Middle area " << coords.first << " : " << coords.second;
+        removeElement(cordsPair, coords.first, coords.second - 1);
+        removeElement(cordsPair, coords.first, coords.second + 1);
+        removeElement(cordsPair, coords.first + 1, coords.second - 1);
+        removeElement(cordsPair, coords.first + 1, coords.second);
+        removeElement(cordsPair, coords.first + 1, coords.second + 1);
+        removeElement(cordsPair, coords.first - 1, coords.second - 1);
+        removeElement(cordsPair, coords.first - 1, coords.second);
+        removeElement(cordsPair, coords.first - 1, coords.second + 1);
+    }
+
+    //расстанавливаем бомбы;
     int pos;
     while(i < bombs)
     {
         pos = rand() % cordsPair.size();
+        //если клетка закрыта и не равна стартовой позиции;
         if(m_cells2dArr[cordsPair.at(pos).first][cordsPair.at(pos).second]->getCellState() == eClosed
                 && (coords != cordsPair.at(pos)))
         {
             m_cells2dArr[cordsPair.at(pos).first][cordsPair.at(pos).second]->setState(eBomb, false);
             //qDebug() << "Removed: " <<  cordsPair.at(pos);
+
+            //удаляем элемент из массива за ненадобностью;
             cordsPair.remove(pos);
-
-            //создаём пустые клетки вокруг стартовой клетки;
-            if(emptyNeighborhood)
-            {
-                //angles;
-                if(coords.first == 0 && coords.second == 0)
-                {
-                    //qDebug() << "Left Top Angle";
-                    removeElement(cordsPair, coords.first, coords.second + 1);
-                    removeElement(cordsPair, coords.first + 1, coords.second);
-                    removeElement(cordsPair, coords.first + 1, coords.second + 1);
-                }
-                else if(coords.first == areaW && coords.second == 0)
-                {
-                    //qDebug() << "Left Bottom Angle";
-                    removeElement(cordsPair, coords.first, coords.second + 1);
-                    removeElement(cordsPair, coords.first - 1, coords.second);
-                    removeElement(cordsPair, coords.first - 1, coords.second + 1);
-                }
-                else if(coords.first == areaW && coords.second == areaH)
-                {
-                    //qDebug() << "Right Bottom Angle";
-                    removeElement(cordsPair, coords.first, coords.second - 1);
-                    removeElement(cordsPair, coords.first - 1, coords.second);
-                    removeElement(cordsPair, coords.first - 1, coords.second - 1);
-                }
-                else if(coords.first == 0 && coords.second == areaH)
-                {
-                    //qDebug() << "Right Top Angle";
-                    removeElement(cordsPair, coords.first, coords.second - 1);
-                    removeElement(cordsPair, coords.first + 1, coords.second - 1);
-                    removeElement(cordsPair, coords.first + 1, coords.second);
-                }
-                //parallels;
-                else if(coords.second == 0 && coords.first > 0 && coords.first < areaW)
-                {
-                    //qDebug() << "Left Down";
-                    removeElement(cordsPair, coords.first, coords.second + 1);
-                    removeElement(cordsPair, coords.first + 1, coords.second);
-                    removeElement(cordsPair, coords.first + 1, coords.second + 1);
-                    removeElement(cordsPair, coords.first - 1, coords.second);
-                    removeElement(cordsPair, coords.first - 1, coords.second + 1);
-                }
-                else if(coords.second == areaH && coords.first > 0 && coords.first < areaW)
-                {
-                    //qDebug() << "Right Down";
-                    removeElement(cordsPair, coords.first, coords.second - 1);
-                    removeElement(cordsPair, coords.first + 1, coords.second);
-                    removeElement(cordsPair, coords.first + 1, coords.second - 1);
-                    removeElement(cordsPair, coords.first - 1, coords.second);
-                    removeElement(cordsPair, coords.first - 1, coords.second - 1);
-                }
-                else if(coords.first == 0 && coords.second > 0 && coords.second < areaH)
-                {
-                    //qDebug() << "Upper Straight";
-                    removeElement(cordsPair, coords.first, coords.second + 1);
-                    removeElement(cordsPair, coords.first, coords.second - 1);
-                    removeElement(cordsPair, coords.first + 1, coords.second - 1);
-                    removeElement(cordsPair, coords.first + 1, coords.second);
-                    removeElement(cordsPair, coords.first + 1, coords.second + 1);
-
-                }
-                else if(coords.first == areaW && coords.second > 0 && coords.second < areaH)
-                {
-                    //qDebug() << "Bottom Straight";
-                    removeElement(cordsPair, coords.first, coords.second + 1);
-                    removeElement(cordsPair, coords.first, coords.second - 1);
-                    removeElement(cordsPair, coords.first - 1, coords.second - 1);
-                    removeElement(cordsPair, coords.first - 1, coords.second);
-                    removeElement(cordsPair, coords.first - 1, coords.second + 1);
-                }
-                else
-                {
-                    //qDebug() << "Middle area";
-                    removeElement(cordsPair, coords.first, coords.second - 1);
-                    removeElement(cordsPair, coords.first, coords.second + 1);
-                    removeElement(cordsPair, coords.first - 1, coords.second - 1);
-                    removeElement(cordsPair, coords.first - 1, coords.second);
-                    removeElement(cordsPair, coords.first - 1, coords.second + 1);
-                    removeElement(cordsPair, coords.first + 1, coords.second - 1);
-                    removeElement(cordsPair, coords.first + 1, coords.second);
-                    removeElement(cordsPair, coords.first + 1, coords.second + 1);
-
-                }
-                emptyNeighborhood = false;
-            }
-            ++i;
         }
+        ++i;
     }
 
     //сколько бомб вокруг клетки;
@@ -819,10 +852,12 @@ void Minesweeper::writeSettings()
 
 void Minesweeper::removeElement(QVector<QPair<int, int> > &pair, int pos1, int pos2)
 {
-    for(int i(0); i < pair.size(); ++i)
+    for(int i(0); i <= pair.size(); ++i)
     {
         if(pair.at(i).first == pos1 && pair.at(i).second == pos2)
+        {
             pair.remove(i);
+        }
     }
 }
 
