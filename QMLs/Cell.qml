@@ -3,6 +3,11 @@ import QtQuick 2.4
 Item {
     property int cSize: 35
     property int cellIndex
+    property bool leftMouseBtnPressed: false
+    property bool rightMouseBtnPressed: false
+    property bool rightMouseBtnHolded: false
+    property bool leftMouseBtnHolded: false
+    property bool leftRightMouseBtnUnHolded: false
 
     width: cSize
     height: cSize
@@ -113,31 +118,62 @@ Item {
                 //note: middleMouseClick second args: 1 = onMiddleButtonClick, 2 = onPressAndHold
                 anchors.fill: parent
                 acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+
                 onClicked:
                 {
                     if(mouse.button == Qt.LeftButton)
                     {
                         timer1.start();
                         cppObject.leftMouseBtnClick(cellIndex);
+                        leftMouseBtnPressed = true;
                     }
-                    else if(mouse.button == Qt.RightButton)
+                    if(mouse.button == Qt.RightButton)
                     {
                         cppObject.rightMouseBtnClick(cellIndex);
+                        rightMouseBtnPressed = true;
                     }
-                    else if(mouse.button == Qt.MiddleButton)
+                    if(mouse.button == Qt.MiddleButton)
+                        cppObject.middleMouseClick(cellIndex, 1);
+
+                    //both mouse buttons click handler;
+                    if(rightMouseBtnPressed && leftMouseBtnPressed)
                         cppObject.middleMouseClick(cellIndex, 1);
                 }
+
                 onPressAndHold:
                 {
                     if(mouse.button == Qt.MiddleButton)
+                        cppObject.middleMouseClick(cellIndex , 2);
+                    if(mouse.button == Qt.LeftButton)
+                        leftMouseBtnHolded = true;
+                    if(mouse.button == Qt.RightButton)
+                        rightMouseBtnHolded = true;
+                    if(rightMouseBtnHolded && leftMouseBtnHolded)
                     {
                         cppObject.middleMouseClick(cellIndex , 2);
+                        leftRightMouseBtnUnHolded = true;
                     }
-
                 }
+
                 onReleased: {
                     if(mouse.button == Qt.MiddleButton)
                         cppObject.middleMouseClick(cellIndex , 3);
+                    else if(mouse.button == Qt.RightButton)
+                    {
+                        rightMouseBtnPressed = false;
+                        rightMouseBtnHolded = false;
+                    }
+                    else if(mouse.button == Qt.LeftButton)
+                    {
+                        leftMouseBtnPressed = false;
+                        leftMouseBtnHolded = false;
+                    }
+                    if(leftRightMouseBtnUnHolded)
+                    {
+                        cppObject.middleMouseClick(cellIndex , 3);
+                        leftRightMouseBtnUnHolded = false;
+                    }
+
                 }
             }
         }
