@@ -11,6 +11,10 @@ ApplicationWindow {
 
     modality :  Qt.ApplicationModal
 
+    // Window fit to center;
+    x: (Screen.width - width) / 2
+    y: (Screen.height - height) / 2
+
     minimumWidth: 400
     maximumWidth: 400
     minimumHeight: 200

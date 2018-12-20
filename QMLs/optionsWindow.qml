@@ -6,16 +6,18 @@ import QtQuick.Controls.Styles 1.4
 
 Window {
     id: optionsRoot
-    width: 300
-    height: 300
+    width: 370
+    height: 360
     visible: true
-
     modality :  Qt.ApplicationModal
+    maximumWidth: 370
+    minimumWidth: 370
+    maximumHeight: 360
+    minimumHeight: 360
 
-    maximumWidth: 300
-    minimumWidth: 300
-    maximumHeight: 300
-    minimumHeight: 300
+    // Window fit to center;
+    x: (Screen.width - width) / 2
+    y: (Screen.height - height) / 2
 
     property bool tFIsEnabled: false
     property int optionsWidth: 9
